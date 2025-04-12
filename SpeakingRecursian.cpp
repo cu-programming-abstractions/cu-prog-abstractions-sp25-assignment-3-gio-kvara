@@ -1,16 +1,48 @@
 #include "SpeakingRecursian.h"
+#include "set.h"
 using namespace std;
 
-Vector<string> allRecursianWords(int numSyllables) {
-    /* TODO: Delete this comment and the next few lines, then implement
-     * this function.
-     */
-    (void) numSyllables;
-    return { };
+namespace {
+const Set<char> CONSONANTS = {'b', 'k', 'n', 'r', 's', '\''};
+const Set<char> VOWELS = {'e', 'i', 'u'};
 }
 
+Vector<string> allRecursianWords(int numSyllables) {
+    // Base case: 0 syllables is just the empty string
+    if (numSyllables == 0) {
+        return {""};
+    }
+    // Error cases: negative syllables
+    if (numSyllables < 0) {
+        error("Number of syllables must be non-negative");
+    }
 
-/* * * * * Test Cases Below This Point * * * * */
+    // Get all words with one fewer syllable
+    Vector<string> shorterWords = allRecursianWords(numSyllables - 1);
+    Vector<string> result;
+
+    for (const string& word : shorterWords) {
+        bool lastWasSingleVowel = !word.empty() &&
+                                  word.back() != '\'' &&
+                                  VOWELS.contains(word.back());
+
+        // Case 1: Add consonant-vowel syllable
+        for (char consonant : CONSONANTS) {
+            for (char vowel : VOWELS) {
+                result.add(word + consonant + vowel);
+            }
+        }
+
+        // Case 2: Add single vowel only if previous wasn't a single vowel
+        if (!lastWasSingleVowel) {
+            for (char vowel : VOWELS) {
+                result.add(word + vowel);
+            }
+        }
+    }
+
+    return result;
+}
 #include "GUI/SimpleTest.h"
 #include "GUI/TextUtils.h"
 #include "set.h"

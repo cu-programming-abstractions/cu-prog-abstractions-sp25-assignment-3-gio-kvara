@@ -1,19 +1,61 @@
 #include "MountainsOfRecursia.h"
+#include "random.h"
 using namespace std;
 
 Vector<Point> makeMountainRange(const Point& left,
                                 const Point& right,
                                 int amplitude,
                                 double decayRate) {
-    /* TODO: Delete this comment and the next few lines, then implement this
-     * function.
-     */
-    (void) left;
-    (void) right;
-    (void) amplitude;
-    (void) decayRate;
-    return { };
+    if(left.x > right.x)
+    {
+        error("not logical, left is further than right");
+    }
+
+    if(amplitude < 0)
+    {
+        error("amplitude can not be negative");
+
+    }
+
+    if(decayRate < 0 || decayRate > 1)
+    {
+        error("invalid decay rate");
+    }
+
+    Vector<Point> mountainpoints;
+
+
+
+    if(right.x - left.x <= 3)
+    {
+        return {left, right};
+    }else
+    {
+        Point midpoint = {(left.x + right.x)/2, (left.y + right.y)/2};
+
+        midpoint.y += randomInteger(-amplitude, amplitude);
+
+        Vector<Point> leftHalf = makeMountainRange(left, midpoint, amplitude * decayRate, decayRate);
+        Vector<Point> RightHalf = makeMountainRange(midpoint, right, amplitude * decayRate, decayRate);
+
+        leftHalf.remove(leftHalf.size() - 1);
+        leftHalf += RightHalf;
+
+        return leftHalf;
+
+
+
+
+    }
+
+
+
+
+
+
+
 }
+
 
 /* * * * * Test Cases Below This Point * * * * */
 #include "GUI/SimpleTest.h"

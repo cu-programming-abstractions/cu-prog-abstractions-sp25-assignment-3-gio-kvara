@@ -2,13 +2,76 @@
 using namespace std;
 
 Vector<Rectangle> makeTemple(const Rectangle& bounds, const TempleParameters& params) {
-    /* TODO: Delete this comment and the next few lines, then implement this function. */
-    (void) bounds;
-    (void) params;
-    return { };
+
+    // error handling
+    if (params.order < 0)
+    {
+        error ("order is negative");
+    }
+
+    // main function
+    Vector<Rectangle> temple;
+
+    if (params.order == 0)
+    {
+        // return empty vector
+        return temple;
+    }
+
+    // base
+    Rectangle baseRect;
+    baseRect.width = bounds.width * params.baseWidth;
+    baseRect.height = bounds.height * params.baseHeight;
+    baseRect.x = bounds.x + ((bounds.width - baseRect.width) / 2);
+    baseRect.y = bounds.y + (bounds.height - baseRect.height);
+
+    // column
+    Rectangle columnRect;
+    columnRect.width = bounds.width * params.columnWidth;
+    columnRect.height = bounds.height * params.columnHeight;
+    columnRect.x = bounds.x + ((bounds.width - columnRect.width) / 2);
+    columnRect.y = bounds.y + (bounds.height - (columnRect.height + baseRect.height));
+
+    // add shapes to temple vector
+    temple.add(baseRect);
+    temple.add(columnRect);
+
+    // upper templpe bounds
+    Rectangle upperBounds;
+    upperBounds.x = columnRect.x;
+    upperBounds.height = params.upperTempleHeight * bounds.height;
+    upperBounds.y = columnRect.y - upperBounds.height;
+    upperBounds.width = columnRect.width;
+
+    // update parameters
+    TempleParameters paramsUpd = params;
+    paramsUpd.order --;
+
+    temple += makeTemple(upperBounds, paramsUpd);
+
+    // small temple bounds
+    Rectangle smallTempleBounds;
+
+    // left
+    smallTempleBounds.width = bounds.width * params.smallTempleWidth;
+    smallTempleBounds.height = bounds.height * params.smallTempleHeight;
+    smallTempleBounds.x = baseRect.x;
+    smallTempleBounds.y = baseRect.y - smallTempleBounds.height;
+    temple += makeTemple(smallTempleBounds, paramsUpd);
+
+    // spacing between small temples
+    int spacing = (baseRect.width - (smallTempleBounds.width * params.numSmallTemples)) / (params.numSmallTemples - 1);
+
+    // middle + right
+    for (int i = 0; i < (params.numSmallTemples - 1); i++)
+    {
+        smallTempleBounds.x += (smallTempleBounds.width + spacing);
+        temple += makeTemple(smallTempleBounds, paramsUpd);
+    }
+
+    // recursion
+    return temple;
 }
-
-
 
 /* * * * * Test Cases Below This Point * * * * */
 #include "GUI/SimpleTest.h"
